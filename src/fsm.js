@@ -33,21 +33,18 @@ class FSM {
         throw new Error("Ошибка в данных");
         }
     }
-
     /**
      * Changes state according to event transition rules.
      * @param event
      */
     trigger(event) {
-
+       this.state = this.state.event;
     }
-
-
     /**
      * Resets FSM state to initial.
      */
     reset() {
-        this.state = config.initial;
+        this.state = this.config.initial;
     }
 
     /**
@@ -56,7 +53,29 @@ class FSM {
      * @param event
      * @returns {Array}
      */
-    getStates(event) {}
+    getStates(event) {
+        var arr = [];
+        var i = 0;
+        for(var key in this.config.states){
+                arr[i] = key;
+                i++;
+            }
+        if(!event){            
+            return arr;
+        }
+        // for(var k in this.config.states){
+        //    if (k ==state) {
+        //     this.state = state;
+        //     }  
+        // }
+        for(var g = arr.length-1; g>=0; g--){
+            if(arr[g] !== event){
+                arr.pop();
+            }
+        }
+        return arr;
+
+    }
 
     /**
      * Goes back to previous state.
