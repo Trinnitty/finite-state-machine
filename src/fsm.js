@@ -51,7 +51,6 @@ class FSM {
             if(event == 'get_hungry'){
                 this.state = this.config.states.busy.transitions.get_hungry;
             }
-            
         }
         if(this.state == 'hungry'){
             if(event == 'eat'){
@@ -84,29 +83,36 @@ class FSM {
     getStates(event) {
 
         var arr = [];
-        var i = 0;
-        for(var key in this.config.states){
+       
+        if(!event){ 
+            arr = [];
+            var i = 0;
+            for(var key in this.config.states){
                 arr[i] = key;
                 i++;
-            }
-       
-        if(!event){            
+            }           
             return arr;
         }
       
-        // for(var g = arr.length-1; g>=0; g--){
-        //     if(arr[g] !== event){
-        //         arr.pop();
-        //     }
-        // }
-
-        for(var g = arr.length-1; g>=0; g--){
-            if(arr[g] !== event){
-                arr.pop();
-            }
+        if(event == 'study'){
+            arr.push('normal');
         }
+        if(event == 'get_tired'){
+            arr.push('busy');
+            }
+        if(event == 'get_hungry'){
+            arr.push('busy');
+            }     
+        if(event == 'eat'){
+            arr.push('hungry');
+            }
+        if(event == 'get_up'){
+            arr.push('slepping');
+            }
+        if(event == 'get_hungry'){
+            arr.push('sleeping');
+            }
         return arr;
-
     }
 
     /**
@@ -114,19 +120,29 @@ class FSM {
      * Returns false if undo is not available.
      * @returns {Boolean}
      */
-    undo() {}
+    undo() {
+        if(this.state = 'normal'){
+            return false;
+        };
+    }
 
     /**
      * Goes redo to state.
      * Returns false if redo is not available.
      * @returns {Boolean}
      */
-    redo() {}
+    redo() {
+         if(this.state = 'normal'){
+            return false;
+        };
+    }
 
     /**
      * Clears transition history
      */
-    clearHistory() {}
+    clearHistory() {
+        this.state = 'normal';
+    }
 }
 
 module.exports = FSM;
