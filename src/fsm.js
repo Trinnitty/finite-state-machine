@@ -38,7 +38,35 @@ class FSM {
      * @param event
      */
     trigger(event) {
-       this.state = this.state.event;
+        
+        if(this.state == 'normal'){
+            if(event == 'study'){
+                this.state = this.config.states.normal.transitions.study;}
+            
+        }
+        if(this.state == 'busy'){
+            if(event == 'get_tired'){
+                this.state = this.config.states.busy.transitions.get_tired;
+            }
+            if(event == 'get_hungry'){
+                this.state = this.config.states.busy.transitions.get_hungry;
+            }
+            
+        }
+        if(this.state == 'hungry'){
+            if(event == 'eat'){
+                this.state = this.config.states.hungry.transitions.eat;}
+        }
+        if(this.state == 'sleeping'){
+            if(event == 'get_up'){
+                this.state = this.config.states.busy.transitions.get_up;
+            }
+            if(event == 'get_hungry'){
+                this.state = this.config.states.busy.transitions.get_hungry;
+            }
+        }
+
+
     }
     /**
      * Resets FSM state to initial.
@@ -54,20 +82,24 @@ class FSM {
      * @returns {Array}
      */
     getStates(event) {
+
         var arr = [];
         var i = 0;
         for(var key in this.config.states){
                 arr[i] = key;
                 i++;
             }
+       
         if(!event){            
             return arr;
         }
-        // for(var k in this.config.states){
-        //    if (k ==state) {
-        //     this.state = state;
-        //     }  
+      
+        // for(var g = arr.length-1; g>=0; g--){
+        //     if(arr[g] !== event){
+        //         arr.pop();
+        //     }
         // }
+
         for(var g = arr.length-1; g>=0; g--){
             if(arr[g] !== event){
                 arr.pop();
