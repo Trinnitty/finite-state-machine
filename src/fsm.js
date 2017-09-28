@@ -7,8 +7,10 @@ class FSM {
     	if (!config) {
     		throw new Error("Ошибка в данных");
   		}
-    	this.state = config.initial;
         this.config = config;
+    	this.state = this.config.initial;
+       
+        this.currentStates = [this.config.initial];
     }
 
     /**
@@ -27,6 +29,7 @@ class FSM {
         for(var key in this.config.states){
            if (key==state) {
             this.state = state;
+            this.currentStates.push(state);
             }  
         }
         if(this.state !== state){
@@ -41,27 +44,35 @@ class FSM {
         
         if(this.state == 'normal'){
             if(event == 'study'){
-                this.state = this.config.states.normal.transitions.study;}
-            
+                this.state = this.config.states.normal.transitions.study;
+                this.currentStates.push('busy');
+            } 
         }
         if(this.state == 'busy'){
             if(event == 'get_tired'){
                 this.state = this.config.states.busy.transitions.get_tired;
-            }
-            if(event == 'get_hungry'){
+                this.currentStates.push('sleeping');
+            } else if(event == 'get_hungry'){
                 this.state = this.config.states.busy.transitions.get_hungry;
+                this.currentStates.push('hungry');
             }
         }
         if(this.state == 'hungry'){
             if(event == 'eat'){
-                this.state = this.config.states.hungry.transitions.eat;}
+                this.state = this.config.states.hungry.transitions.eat;
+                this.currentStates.push('normal');
+
+            }
         }
         if(this.state == 'sleeping'){
             if(event == 'get_up'){
                 this.state = this.config.states.busy.transitions.get_up;
+                this.currentStates.push('normal');
             }
             if(event == 'get_hungry'){
                 this.state = this.config.states.busy.transitions.get_hungry;
+                this.currentStates.push('hungry');
+
             }
         }
 
@@ -121,9 +132,15 @@ class FSM {
      * @returns {Boolean}
      */
     undo() {
-        if(this.state = 'normal'){
+        if(this.state == 'normal'){
             return false;
-        };
+        };      
+        this.currentStates.pop();
+        this.state = this.currentStates[this.currentStates.length-1];
+        if(this.currentStates.length == 0){
+            return false;
+        } else {
+            return true;}
     }
 
     /**
