@@ -19,8 +19,7 @@ class FSM {
      * @returns {String}
      */
     getState() {
-    	return this.currentStates[this.currentStates.length-1];
-      // return this.currentStates;
+    	return this.state = this.currentStates[this.currentStates.length-1];
     }
 
     /**
@@ -45,33 +44,29 @@ class FSM {
      */
     trigger(event) {
         this.undoStates = [];
+
         if(this.state == 'normal'){
             if(event == 'study'){
                 this.state = this.config.states.normal.transitions.study;
                 this.currentStates.push('busy');
             } 
-        }
-
-        if(this.state == 'busy'){
+        } else if(this.state == 'busy'){
             if(event == 'get_tired'){
                 this.state = this.config.states.busy.transitions.get_tired;
                 this.currentStates.push('sleeping');
-            }
-            if(event == 'get_hungry'){
+            } else  if(event == 'get_hungry'){
                 this.state = this.config.states.busy.transitions.get_hungry;
                 this.currentStates.push('hungry');
+            } else {
+              throw new Error("Ошибка в данных");
             }
-        }
-
-        if(this.state == 'hungry'){
+            
+        }else if(this.state == 'hungry'){
             if(event == 'eat'){
                 this.state = this.config.states.hungry.transitions.eat;
                 this.currentStates.push('normal');
-
             }
-        }
-
-        if(this.state == 'sleeping'){
+        }else if(this.state == 'sleeping'){
             if(event == 'get_up'){
                 this.state = this.config.states.busy.transitions.get_up;
                 this.currentStates.push('normal');
@@ -79,10 +74,8 @@ class FSM {
             if(event == 'get_hungry'){
                 this.state = this.config.states.busy.transitions.get_hungry;
                 this.currentStates.push('hungry');
-
             }
-        }
-
+        } 
     }
     /**
      * Resets FSM state to initial.
@@ -153,28 +146,28 @@ class FSM {
             return false;
         }; 
     }
-    /**
-     * Goes redo to state.
-     * Returns false if redo is not available.
-     * @returns {Boolean}
-     */
+    
     redo() {
-
         var ost = this.undoStates[this.undoStates.length-1];
         this.currentStates.push(ost);
         var lost = this.undoStates.pop();
         this.state = this.currentStates[this.currentStates.length-1];
 
-
-        if(this.undoStates.length == 0 && this.currentStates.length == 1){
-            return false;
-        }    
         if(this.undoStates.length == 0){
-          return false;
-        }
-        if(this.undoStates.length > 0 ){
-            return true;
-        }
+            return false;
+        } else {
+            return true;}
+        if(this.undoStates.length == 1){
+            return false;
+        }; 
+
+        // if(this.undoStates.length == 0 && this.currentStates.length == 1){
+        //     return false;
+        // }  else if(this.undoStates.length == 0){
+        //   return false;
+        // } else if(this.undoStates.length == 0 && this.currentStates.length > 1){
+        //   return true;}
+       
 
     }
     /**
