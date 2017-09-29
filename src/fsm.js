@@ -10,7 +10,8 @@ class FSM {
         this.config = config;
     	this.state = this.config.initial;
        
-        this.currentStates = [this.config.initial];
+        this.currentStates = ['normal'];
+        this.undoStates = [];
     }
 
     /**
@@ -18,7 +19,8 @@ class FSM {
      * @returns {String}
      */
     getState() {
-    	return this.state;
+    	return this.currentStates[this.currentStates.length-1];
+      // return this.currentStates;
     }
 
     /**
@@ -35,28 +37,32 @@ class FSM {
         if(this.state !== state){
         throw new Error("Ошибка в данных");
         }
+        this.undoStates = [];
     }
     /**
      * Changes state according to event transition rules.
      * @param event
      */
     trigger(event) {
-        
+        this.undoStates = [];
         if(this.state == 'normal'){
             if(event == 'study'){
                 this.state = this.config.states.normal.transitions.study;
                 this.currentStates.push('busy');
             } 
         }
+
         if(this.state == 'busy'){
             if(event == 'get_tired'){
                 this.state = this.config.states.busy.transitions.get_tired;
                 this.currentStates.push('sleeping');
-            } else if(event == 'get_hungry'){
+            }
+            if(event == 'get_hungry'){
                 this.state = this.config.states.busy.transitions.get_hungry;
                 this.currentStates.push('hungry');
             }
         }
+
         if(this.state == 'hungry'){
             if(event == 'eat'){
                 this.state = this.config.states.hungry.transitions.eat;
@@ -64,6 +70,7 @@ class FSM {
 
             }
         }
+
         if(this.state == 'sleeping'){
             if(event == 'get_up'){
                 this.state = this.config.states.busy.transitions.get_up;
@@ -76,13 +83,13 @@ class FSM {
             }
         }
 
-
     }
     /**
      * Resets FSM state to initial.
      */
     reset() {
-        this.state = this.config.initial;
+        this.currentStates = [];
+        this.currentStates.push(this.config.initial);
     }
 
     /**
@@ -132,33 +139,50 @@ class FSM {
      * @returns {Boolean}
      */
     undo() {
-        if(this.state == 'normal'){
-            return false;
-        };      
-        this.currentStates.pop();
+             
+        var last = this.currentStates[this.currentStates.length-1];
+        this.undoStates.push(last);
+        var del = this.currentStates.pop();
         this.state = this.currentStates[this.currentStates.length-1];
+
         if(this.currentStates.length == 0){
             return false;
         } else {
             return true;}
+        if(this.currentStates.length == 1){
+            return false;
+        }; 
     }
-
     /**
      * Goes redo to state.
      * Returns false if redo is not available.
      * @returns {Boolean}
      */
     redo() {
-         if(this.state = 'normal'){
-            return false;
-        };
-    }
 
+        var ost = this.undoStates[this.undoStates.length-1];
+        this.currentStates.push(ost);
+        var lost = this.undoStates.pop();
+        this.state = this.currentStates[this.currentStates.length-1];
+
+
+        if(this.undoStates.length == 0 && this.currentStates.length == 1){
+            return false;
+        }    
+        if(this.undoStates.length == 0){
+          return false;
+        }
+        if(this.undoStates.length > 0 ){
+            return true;
+        }
+
+    }
     /**
      * Clears transition history
      */
     clearHistory() {
-        this.state = 'normal';
+        this.currentStates = [];
+        this.currentStates[0] = 'normal';
     }
 }
 
