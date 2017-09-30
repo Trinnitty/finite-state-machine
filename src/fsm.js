@@ -8,10 +8,12 @@ class FSM {
     		throw new Error("Ошибка в данных");
   		}
         this.config = config;
-    	this.state = this.config.initial;
+    	 this.state = this.config.initial;
        
         this.currentStates = ['normal'];
         this.undoStates = [];
+        this.redoStates = [];
+       
     }
 
     /**
@@ -148,34 +150,34 @@ class FSM {
     }
     
     redo() {
+        if(this.undoStates.length == 0){
+          return false;
+        }
+        
+        if(this.undoStates.length == 0 && this.currentStates[this.currentStates.length-1]=='normal'){
+          return false;
+        } 
         var ost = this.undoStates[this.undoStates.length-1];
+        this.redoStates.push(ost);
         this.currentStates.push(ost);
         var lost = this.undoStates.pop();
         this.state = this.currentStates[this.currentStates.length-1];
-
-        if(this.undoStates.length == 0){
-            return false;
-        } else {
-            return true;}
-        if(this.undoStates.length == 1){
-            return false;
-        }; 
-
-        // if(this.undoStates.length == 0 && this.currentStates.length == 1){
-        //     return false;
-        // }  else if(this.undoStates.length == 0){
-        //   return false;
-        // } else if(this.undoStates.length == 0 && this.currentStates.length > 1){
-        //   return true;}
-       
-
+        
+        if(this.state == 'normal' && this.currentStates.length==1){
+          return false;
+        } 
+        
+       if( this.redoStates[0] === this.currentStates[this.currentStates.length-1]){
+           return true;
+        }
     }
     /**
      * Clears transition history
      */
     clearHistory() {
-        this.currentStates = [];
-        this.currentStates[0] = 'normal';
+        this.state = 'normal';
+        this.currentStates=[];
+        this.currentStates.push('normal');
     }
 }
 
